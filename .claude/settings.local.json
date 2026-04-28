@@ -10,7 +10,9 @@
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "WebSearch",
       "WebFetch(domain:apkpure.com)",
-      "WebFetch(domain:actpal.com)"
+      "WebFetch(domain:actpal.com)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
