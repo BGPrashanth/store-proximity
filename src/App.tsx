@@ -33,23 +33,32 @@ Notifications.setNotificationHandler({
 
 type PermissionState = 'pending' | 'foreground-only' | 'full' | 'denied';
 
-function formatAddress(geo: Location.LocationGeocodedAddress): string {
-  const parts = [
-    geo.name,
+function parseGeocode(geo: Location.LocationGeocodedAddress): {
+  landmarkName: string | null;
+  address: string;
+} {
+  const addressParts = [
+    geo.streetNumber,
     geo.street,
     geo.district,
     geo.city,
     geo.region,
+    geo.postalCode,
     geo.country,
   ].filter(Boolean);
-  return parts.join(', ');
+
+  return {
+    landmarkName: geo.name ?? null,
+    address: addressParts.join(', '),
+  };
 }
 
 export default function App() {
   const [permissionState, setPermissionState] = useState<PermissionState>('pending');
   const [welcomeStore, setWelcomeStore] = useState<string | null>(null);
   const [currentLocation, setCurrentLocation] = useState<Location.LocationObject | null>(null);
-  const [landmark, setLandmark] = useState<string | null>(null);
+  const [landmarkName, setLandmarkName] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
   const stopForegroundRef = useRef<(() => void) | null>(null);
 
   const onLocationUpdate = useCallback(async (loc: Location.LocationObject) => {
@@ -61,7 +70,11 @@ export default function App() {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
       });
-      if (geo) setLandmark(formatAddress(geo));
+      if (geo) {
+        const { landmarkName: name, address: addr } = parseGeocode(geo);
+        setLandmarkName(name);
+        setAddress(addr);
+      }
     } catch {
       // Geocoder unavailable — silently skip
     }
@@ -164,8 +177,15 @@ export default function App() {
             <Text style={styles.locationAccuracy}>
               Accuracy: ±{currentLocation.coords.accuracy?.toFixed(1) ?? '?'} m
             </Text>
-            {landmark ? (
-              <Text style={styles.landmark}>{landmark}</Text>
+            {landmarkName || address ? (
+              <View style={styles.geocodeBlock}>
+                {landmarkName ? (
+                  <Text style={styles.landmarkName}>{landmarkName}</Text>
+                ) : null}
+                {address ? (
+                  <Text style={styles.address}>{address}</Text>
+                ) : null}
+              </View>
             ) : (
               <Text style={styles.locationWaiting}>Resolving address…</Text>
             )}
@@ -257,11 +277,19 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 4,
   },
-  landmark: {
-    fontSize: 15,
-    color: '#333',
+  geocodeBlock: {
     marginTop: 10,
-    lineHeight: 22,
+  },
+  landmarkName: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 3,
+  },
+  address: {
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 19,
   },
   locationWaiting: {
     fontSize: 15,
