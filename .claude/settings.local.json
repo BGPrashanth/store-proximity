@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-expo-app@latest . --template blank-typescript --yes)",
+      "Bash(npx create-expo-app@latest . --template blank-typescript --yes --no-install)",
+      "Bash(npx create-expo-app@latest . --template blank-typescript)",
+      "Bash(cd /tmp)",
+      "Bash(npx create-expo-app@latest store-proximity --template blank-typescript)",
+      "WebFetch(domain:play.google.com)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebSearch",
+      "WebFetch(domain:apkpure.com)",
+      "WebFetch(domain:actpal.com)"
+    ]
+  }
+}
